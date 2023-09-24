@@ -1,0 +1,14 @@
+# drs-js:
+#   filter: rjsmin
+#   output: ckanext-drs/%(version)s-drs.js
+#   contents:
+#     - js/drs.js
+#   extra:
+#     preload:
+#       - base/main
+
+# drs-css:
+#   filter: cssrewrite
+#   output: ckanext-drs/%(version)s-drs.css
+#   contents:
+#     - css/drs.css
