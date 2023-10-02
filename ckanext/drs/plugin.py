@@ -7,6 +7,7 @@ class DrsPlugin(plugins.SingletonPlugin):
     plugins.implements(plugins.IConfigurer)
     plugins.implements(plugins.ITemplateHelpers)
     plugins.implements(plugins.IResourceController, inherit=True)
+    plugins.implements(plugins.IBluperprint, inherit=True)
 
     # IConfigurer
 
@@ -24,3 +25,10 @@ class DrsPlugin(plugins.SingletonPlugin):
     def before_show(self, resource_dict):
         # check for drs resource
         drs_res = utils.get_drs_resource(resource_dict)
+
+
+
+    # IBlueprint
+    def get_blueprint(self):
+        # return a blueprint object that can be used to register routes
+        pass
