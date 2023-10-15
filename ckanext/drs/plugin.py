@@ -3,6 +3,7 @@ import ckan.plugins.toolkit as toolkit
 from ckanext.drs import views
 from ckanext.drs import utils
 from ckanext.drs import actions
+from ckanext.drs import auth
 
 
 class DrsPlugin(plugins.SingletonPlugin):
@@ -11,6 +12,7 @@ class DrsPlugin(plugins.SingletonPlugin):
     plugins.implements(plugins.IResourceController, inherit=True)
     plugins.implements(plugins.IBlueprint, inherit=True)
     plugins.implements(plugins.IActions)
+    plugins.implements(plugins.IAuthFunctions)
 
     # IConfigurer
 
@@ -27,7 +29,8 @@ class DrsPlugin(plugins.SingletonPlugin):
     # IResourceController
     def before_show(self, resource_dict):
         # check for drs resource
-        drs_res = utils.get_drs_resource(resource_dict)
+        #drs_res = utils.get_drs_resource(resource_dict)
+        pass 
 
 
     # IBlueprint
@@ -38,6 +41,14 @@ class DrsPlugin(plugins.SingletonPlugin):
     # IActions
     def get_actions(self):
         return {
-            'drs_option_show': actions.drs_option_show,
+            'drs_option_show': actions.option_show,
+            'drs_get_object_info': actions.get_object_info,
             'drs_service_info_show': actions.service_info_show
+        }
+
+    # IAuthFunctions
+    def get_auth_functions(self):
+        return {
+            'drs_option_show': auth.option_show,
+            'drs_get_object_info': auth.get_object_info,
         }

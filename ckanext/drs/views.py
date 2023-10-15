@@ -6,30 +6,43 @@ from flask import Blueprint, make_response
 
 from ckan.plugins import toolkit as tk
 
+import ckan.views.api as api
+
 import logging
 
 
 log = logging.getLogger(__name__)
 
-drs_blueprint = Blueprint('drs', __name__, url_prefix='/drs')
+drs_blueprint = Blueprint('drs', __name__, url_prefix='/ga4gh/drs/v1') # ga4gh/drs/v1
 
 
-def drs_option(res_id):
+def drs_option(object_id):
     # Return the DRS option for a resource
     response = tk.get_action('drs_option_show')(
-        {'ignore_auth': True}, {'resource_id': res_id})
+        {'ignore_auth': True}, {'object_id': object_id})
+
+    return response
+
+def drs_get_object_info(object_id):
+    # Return the DRS object info for a resource
+    response = tk.get_action('drs_get_object_info')(
+        {'ignore_auth': True}, {'object_id': object_id})
 
     return response
 
 
 def service_info():
     # Return the DRS service info
-    response = tk.get_action('drs_service_info_show')(
+    result = tk.get_action('drs_service_info_show')(
         {}, {})
-
-    return make_response(str(response), 200, {'Content-Type': 'application/json'})
+    
+    # breakpoint()
+    response = api._finish_ok(result, content_type=u'json')
+    # return make_response(str(result), 200, {'Content-Type': 'application/json'})
+    return response
     
     
 
-drs_blueprint.add_url_rule('/option/<res_id>', view_func=drs_option, methods=['OPTIONS'])
+drs_blueprint.add_url_rule('/objects/<object_id>', view_func=drs_option, methods=['OPTIONS'])
+drs_blueprint.add_url_rule('/objects/<object_id>', view_func=drs_get_object_info, methods=['GET'])
 drs_blueprint.add_url_rule('/service-info', view_func=service_info, methods=['GET'])
