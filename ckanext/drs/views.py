@@ -29,7 +29,15 @@ def drs_get_object_info(object_id):
         {'ignore_auth': True}, {'object_id': object_id})
 
     return response
+    #return make_response(str(response), 200, {'Content-Type': 'application/json'})
 
+def drs_get_access_url(object_id,access_id):
+    # Return the DRS access url for a resource
+    response = tk.get_action('drs_get_access_url')(
+        {'ignore_auth': True}, {'object_id': object_id, 'access_id': access_id})
+    
+    return response
+    #return make_response(str(response), 200, {'Content-Type': 'application/json'})
 
 def service_info():
     # Return the DRS service info
@@ -45,4 +53,5 @@ def service_info():
 
 drs_blueprint.add_url_rule('/objects/<object_id>', view_func=drs_option, methods=['OPTIONS'])
 drs_blueprint.add_url_rule('/objects/<object_id>', view_func=drs_get_object_info, methods=['GET'])
+drs_blueprint.add_url_rule('/objects/<object_id>/access/<access_id>', view_func=drs_get_access_url, methods=['GET'])
 drs_blueprint.add_url_rule('/service-info', view_func=service_info, methods=['GET'])

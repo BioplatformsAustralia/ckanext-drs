@@ -87,48 +87,7 @@ def service_info_show(context, data_dict):
     return response
 
 def _extract_drs_object(data_dict, is_resource=True):
-    '''{
-        "id": "b8cd0667-2c33-4c9f-967b-161b905932c9",
-        "description": "Open dataset of 384 phenopackets",
-        "created_time": "2021-03-12T20:00:00Z",
-        "name": "phenopackets.test.dataset",
-        "size": 143601,
-        "updated_time": "2021-03-13T12:30:45Z",
-        "version": "1.0.0",
-        "self_uri": "drs://localhost:4500/b8cd0667-2c33-4c9f-967b-161b905932c9",
-        "contents": [
-            {
-                "name": "phenopackets.mundhofir.family",
-                "drs_uri": [
-                    "drs://localhost:4500/1af5cdcf-898c-4dbc-944e-1ac95e82c0ea"
-                ],
-                "id": "1af5cdcf-898c-4dbc-944e-1ac95e82c0ea"
-            },
-            {
-                "name": "phenopackets.zhang.family",
-                "drs_uri": [
-                    "drs://localhost:4500/355a74bd-6571-4d4a-8602-a9989936717f"
-                ],
-                "id": "355a74bd-6571-4d4a-8602-a9989936717f"
-            },
-            {
-                "name": "phenopackets.cao.family",
-                "drs_uri": [
-                    "drs://localhost:4500/a1dd4ae2-8d26-43b0-a199-342b64c7dff6"
-                ],
-                "id": "a1dd4ae2-8d26-43b0-a199-342b64c7dff6"
-            },
-            {
-                "name": "phenopackets.lalani.family",
-                "drs_uri": [
-                    "drs://localhost:4500/c69a3d6c-4a28-4b7c-b215-0782f8d62429"
-                ],
-                "id": "c69a3d6c-4a28-4b7c-b215-0782f8d62429"
-            }
-        ]
-
-    }
-    '''
+    drs_uri = f'drs://{data_dict.get("url").split("/")[2]}/{data_dict.get("id")}' if is_resource else None
     drs_object = {
         'id': data_dict.get('id'),
         'name': (data_dict.get('filename') if is_resource else data_dict.get('name')) or "",
@@ -137,13 +96,84 @@ def _extract_drs_object(data_dict, is_resource=True):
         'updated_time': data_dict.get('last_modified') if is_resource else data_dict.get('metadata_modified'),
         'size': data_dict.get('size') if is_resource else 0,
         'version': data_dict.get('version') if is_resource and data_dict.get('version') else 1,
-        'self_uri': f'drs://{data_dict.get("url").split("/")[2]}/{data_dict.get("id")}',
+        'self_uri': drs_uri,
         'contents': [
             {
                 'name': data_dict.get('name'),
-                'drs_uri': [f'drs://{data_dict.get("url").split("/")[2]}/{data_dict.get("id")}'],
+                'drs_uri': [drs_uri],
                 'id': data_dict.get('id')
             }
         ]
     }
+    if is_resource:
+        drs_object.update({
+            'mime_type': data_dict.get('mimetype'),
+            'checksums': [
+                {
+                    'checksum': data_dict.get('hash'),
+                    'type': 'md5'
+                }
+            ],
+            'access_methods': [
+                {
+                    'access_id': 'download_window',
+                    'type': 'http',
+                    'access_url': get_access_url(data_dict.get('id'), 'download_window')
+                }
+            ],
+            'aliases': [
+                data_dict.get('name')
+            ],
+            'contents': [
+                {
+                    'name': data_dict.get('name'),
+                    'drs_uri': [drs_uri],
+                    'id': data_dict.get('id')
+                }
+            ],
+            'checksum': data_dict.get('hash'),
+            'size': data_dict.get('size'),
+            'version': data_dict.get('version') if data_dict.get('version') else 1
+        })
+    else:
+        drs_object.update({
+            'mime_type': None,
+            'checksums': [
+                {
+                    'checksum': None,
+                    'type': None
+                }
+            ],
+            'access_methods': [
+                {
+                    'access_id': 'download_window',
+                    'type': 'http',
+                    'access_url': None
+                }
+            ],
+            'aliases': [
+                data_dict.get('name')
+            ],
+            'contents': [
+                {
+                    'name': data_dict.get('name'),
+                    'drs_uri': [drs_uri],
+                    'id': data_dict.get('id')
+                }
+            ],
+            'checksum': None,
+            'size': 0,
+            'version': 1
+        })
     return drs_object
+
+def get_access_url(object_id, access_id):
+    # Return the DRS access url for a resource
+    breakpoint()
+    if not object_id:
+        raise tk.ValidationError({'object_id': 'Missing object id'})
+    if not access_id:
+        raise tk.ValidationError({'access_id': 'Missing access id'})
+    if access_id == "download_window":
+        res_data = tk.get_action('resource_show')({},{'id': object_id})
+        return f"download_window?package_id={res_data['package_id']}&resource_id={object_id}"
