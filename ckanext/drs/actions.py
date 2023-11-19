@@ -7,14 +7,12 @@ from ckan.plugins import toolkit as tk
 
 from ckanext.drs.utils import SUPPORTED_TYPES
 
-from ckanext.drs.models.get_service_info200_response import GetServiceInfo200Response
-from ckanext.drs.models.drs_service_type import DrsServiceType
-from ckanext.drs.models.service_organization import ServiceOrganization
+from ckanext.s3filestore.action import download_window as dw
 
 log = logging.getLogger(__name__)
 
 
-def option_show(contect , data_dict):
+def option_show(context , data_dict):
     obj_id = data_dict.get('object_id')
     # Return the DRS option for a resource
     if not obj_id:
@@ -169,7 +167,6 @@ def _extract_drs_object(data_dict, is_resource=True):
 
 def get_access_url(object_id, access_id):
     # Return the DRS access url for a resource
-    breakpoint()
     if not object_id:
         raise tk.ValidationError({'object_id': 'Missing object id'})
     if not access_id:
@@ -177,3 +174,11 @@ def get_access_url(object_id, access_id):
     if access_id == "download_window":
         res_data = tk.get_action('resource_show')({},{'id': object_id})
         return f"download_window?package_id={res_data['package_id']}&resource_id={object_id}"
+    
+
+@tk.side_effect_free
+def download_window(package_id, resource_id):
+    # Return S3 download link for a resource
+    data_dict = {'package_id': package_id, 'resource_id': resource_id}
+    url = dw({}, data_dict)
+    return url   

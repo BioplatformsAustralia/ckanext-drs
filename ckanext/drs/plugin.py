@@ -44,7 +44,8 @@ class DrsPlugin(plugins.SingletonPlugin):
             'drs_option_show': actions.option_show,
             'drs_get_object_info': actions.get_object_info,
             'drs_service_info_show': actions.service_info_show,
-            'drs_get_access_url': actions.get_access_url
+            'drs_get_access_url': actions.get_access_url,
+            'drs_download_window': actions.download_window
         }
 
     # IAuthFunctions
