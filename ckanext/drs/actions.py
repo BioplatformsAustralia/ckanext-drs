@@ -35,7 +35,7 @@ def option_show(context , data_dict):
                 supported_types = ["None"]
         else:
             resource_dict = tk.get_action('resource_show')({},{'id': obj_id})
-            supported_types = ["None"]  
+            supported_types = ["None"]
     except tk.ObjectNotFound:
         tk.abort(404, tk._('Resource not found'))
     except tk.NotAuthorized:
@@ -63,7 +63,6 @@ def get_object_info(context, data_dict):
     return result
 
 
-
 def service_info_show(context, data_dict):
     response = {
         'contact_url': 'mailto:uwe@biocommons.org.au',
@@ -79,10 +78,9 @@ def service_info_show(context, data_dict):
         'type': 'Bioplatforms Australia Data Portal DRS service',
         'updated_at': datetime(2023, 3, 9, 0, 0).date(),
         'version': '0.5b'
-    }
-    
-    
+    } 
     return response
+
 
 def _extract_drs_object(data_dict, is_resource=True):
     drs_uri = f'drs://{data_dict.get("url").split("/")[2]}/{data_dict.get("id")}' if is_resource else None
@@ -116,7 +114,8 @@ def _extract_drs_object(data_dict, is_resource=True):
                 {
                     'access_id': 'download_window',
                     'type': 'http',
-                    'access_url': get_access_url(data_dict.get('id'), 'download_window')
+                    'access_url': get_access_url(data_dict.get('id'),
+                                                 'download_window')
                 }
             ],
             'aliases': [
@@ -145,7 +144,7 @@ def _extract_drs_object(data_dict, is_resource=True):
             'access_methods': [
                 {
                     'access_id': 'download_window',
-                    'type': 'http',
+                    'type': 'https',
                     'access_url': None
                 }
             ],
@@ -165,6 +164,7 @@ def _extract_drs_object(data_dict, is_resource=True):
         })
     return drs_object
 
+
 def get_access_url(object_id, access_id):
     # Return the DRS access url for a resource
     if not object_id:
@@ -181,4 +181,4 @@ def download_window(package_id, resource_id):
     # Return S3 download link for a resource
     data_dict = {'package_id': package_id, 'resource_id': resource_id}
     url = dw({}, data_dict)
-    return url   
+    return url

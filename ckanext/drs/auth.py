@@ -2,7 +2,7 @@ from ckan.plugins import toolkit as tk
 
 
 def option_show(res_id):
-    return {"success": False}
+    return {"success": True}
 
 
 def service_info_show():

@@ -19,7 +19,7 @@ class DrsPlugin(plugins.SingletonPlugin):
     def update_config(self, config_):
         toolkit.add_template_directory(config_, 'templates')
         toolkit.add_public_directory(config_, 'public')
-        toolkit.add_resource('assets','drs')
+        toolkit.add_resource('assets', 'drs')
 
     # ITemplateHelpers
     def get_helpers(self):
