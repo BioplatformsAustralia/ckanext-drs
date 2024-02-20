@@ -21,7 +21,6 @@ class DrsPlugin(plugins.SingletonPlugin):
         toolkit.add_public_directory(config_, 'public')
         toolkit.add_resource('assets','drs')
 
-
     # ITemplateHelpers
     def get_helpers(self):
         return {}
@@ -29,9 +28,8 @@ class DrsPlugin(plugins.SingletonPlugin):
     # IResourceController
     def before_show(self, resource_dict):
         # check for drs resource
-        #drs_res = utils.get_drs_resource(resource_dict)
-        pass 
-
+        # drs_res = utils.get_drs_resource(resource_dict)
+        pass
 
     # IBlueprint
     def get_blueprint(self):
@@ -49,8 +47,8 @@ class DrsPlugin(plugins.SingletonPlugin):
         }
 
     # IAuthFunctions
-    def get_auth_functions(self):
-        return {
-            'drs_option_show': auth.option_show,
-            'drs_get_object_info': auth.get_object_info,
-        }
+    # def get_auth_functions(self):
+    #     return {
+    #         'drs_option_show': auth.option_show,
+    #         'drs_get_object_info': auth.get_object_info,
+    #     }
