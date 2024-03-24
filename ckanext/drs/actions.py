@@ -214,11 +214,11 @@ def download_window(context, data_dict):
     resource_id = data_dict.get("resource_id", None)
     # Return S3 download link for a resource
     data_dict = {"package_id": package_id, "resource_id": resource_id}
-    # url = dw({"ignore_auth": True}, data_dict)
-    # link = url.get("url")
-    # response = {"url": link.split("?")[0], "header": "Authorization: "}
+    url = dw({"ignore_auth": True}, data_dict)
+    link = url.get("url")
+    response = {"url": link.split("?")[0], "header": "Authorization: "}
     # define dummy s3 download link
-    response = {
-        "url": "https://localhost:5000/s3/download"
-        }
+    # response = {
+    #     "url": "https://localhost:5000/s3/download"
+    #     }
     return response
