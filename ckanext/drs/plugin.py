@@ -1,9 +1,13 @@
+import json
+import logging
+
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
 from ckanext.drs import views
-from ckanext.drs import utils
 from ckanext.drs import actions
 from ckanext.drs import auth
+
+log = logging.getLogger(__name__)
 
 
 class DrsPlugin(plugins.SingletonPlugin):
@@ -13,6 +17,7 @@ class DrsPlugin(plugins.SingletonPlugin):
     plugins.implements(plugins.IBlueprint, inherit=True)
     plugins.implements(plugins.IActions)
     plugins.implements(plugins.IAuthFunctions)
+    plugins.implements(plugins.IApiToken, inherit=True)
 
     # IConfigurer
 
@@ -35,7 +40,7 @@ class DrsPlugin(plugins.SingletonPlugin):
     def get_blueprint(self):
         # return a blueprint object that can be used to register routes
         return views.drs_blueprint
-    
+
     # IActions
     def get_actions(self):
         return {
@@ -47,8 +52,15 @@ class DrsPlugin(plugins.SingletonPlugin):
         }
 
     # IAuthFunctions
-    # def get_auth_functions(self):
-    #     return {
-    #         'drs_option_show': auth.option_show,
-    #         'drs_get_object_info': auth.get_object_info,
-    #     }
+    def get_auth_functions(self):
+        return {
+            'drs_option_show': auth.option_show,
+            'drs_get_object_info': auth.get_object_info,
+            'drs_download_window': auth.download_window,
+        }
+
+    # IApiToken
+    def decode_api_token(self, token, **kwargs):
+        # Remove bearer token prefix
+        token = token.split(' ')[-1]
+        return token
