@@ -16,14 +16,14 @@ setup(
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # http://packaging.python.org/en/latest/tutorial.html#version
-    version='0.0.1',
+    version='1.0.0',
 
-    description='''''',
+    description='''CKAN Extension to implement the DRS API''',
     long_description=long_description,
     long_description_content_type="text/markdown",
 
     # The project's main homepage.
-    url='https://github.com/tino097/ckanext-drs',
+    url='https://github.com/BioplatformsAustralia/ckanext-drs',
 
     # Author details
     author='''Konstantin Sivakov''',

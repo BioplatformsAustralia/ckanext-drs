@@ -2,15 +2,11 @@
 
 # ckanext-drs
 
-**TODO:** Put a description of your extension here:  What does it do? What features does it have? Consider including some screenshots or embedding a video!
+This CKAN extension implements the Data Repository Service (DRS) API - https://ga4gh.github.io/data-repository-service-schemas/ - to
+enable programmatic access to CKAN dataset resources.
 
 
 ## Requirements
-
-**TODO:** For example, you might want to mention here which versions of CKAN this
-extension works with.
-
-If your extension works across different versions you can add the following table:
 
 Compatibility with core CKAN versions:
 
@@ -19,7 +15,7 @@ Compatibility with core CKAN versions:
 | 2.6 and earlier | not tested    |
 | 2.7             | not tested    |
 | 2.8             | not tested    |
-| 2.9             | not tested    |
+| 2.9             | yes           |
 
 Suggested values:
 
@@ -117,6 +113,13 @@ If ckanext-drs should be available on PyPI you can follow these steps to publish
 
        git tag 0.0.1
        git push --tags
+
+
+## Acknowledgements
+
+This extension was developed by [Konstantin Sivakov](https://github.com/tino097) based on a prototype by [Uwe Winter](https://github.com/uwint)
+
+This work was supported by the Australian BioCommons, which is enabled by NCRIS via Bioplatforms Australia funding
 
 ## License
 
