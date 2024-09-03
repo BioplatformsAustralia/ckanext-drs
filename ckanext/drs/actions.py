@@ -5,9 +5,6 @@ from datetime import datetime
 
 from ckan.plugins import toolkit as tk
 
-from ckanext.s3filestore.action import download_window as dw
-from ckanext.s3filestore.logic import schema
-
 log = logging.getLogger(__name__)
 
 
@@ -213,13 +210,11 @@ def get_access_url(object_id, access_id):
 def download_window(context, data_dict):
     package_id = data_dict.get("package_id", None)
     resource_id = data_dict.get("resource_id", None)
+
     # Return S3 download link for a resource
-    data_dict = {"package_id": package_id, "resource_id": resource_id}
-    url = dw({"ignore_auth": True}, data_dict)
-    link = url.get("url")
+    dw_data_dict = {"package_id": package_id, "resource_id": resource_id}
+    res_data = tk.get_action("download_window")(context, dw_data_dict)
+    link = res_data.get("url")
+
     response = {"url": link.split("?")[0], "header": "Authorization: "}
-    # define dummy s3 download link
-    # response = {
-    #     "url": "https://localhost:5000/s3/download"
-    #     }
     return response
