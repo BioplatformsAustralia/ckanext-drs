@@ -6,6 +6,7 @@ from datetime import datetime
 from ckan.plugins import toolkit as tk
 
 from ckanext.s3filestore.action import download_window as dw
+from ckanext.s3filestore.logic import schema
 
 log = logging.getLogger(__name__)
 
