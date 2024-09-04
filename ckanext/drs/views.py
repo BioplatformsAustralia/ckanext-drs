@@ -31,7 +31,7 @@ def drs_get_object_info(object_id):
 def drs_get_access_url(object_id, access_id):
     # Return the DRS access url for a resource
     response = tk.get_action("drs_download_window")(
-        {}, {"access_id": access_id, "object_id": object_id}
+        None, {"access_id": access_id, "object_id": object_id}
     )
     return response
 

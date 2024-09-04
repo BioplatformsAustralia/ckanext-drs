@@ -209,6 +209,7 @@ def get_access_url(object_id, access_id):
 @tk.side_effect_free
 def drs_download_window(context, data_dict):
     log.info("drs dw")
+    log.info(context)
     log.info(data_dict)
     object_id = data_dict.get("object_id", None)
     access_id = data_dict.get("access_id", None)
