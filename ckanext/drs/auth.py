@@ -39,7 +39,7 @@ def get_object_info(context, data_dict):
             return {"success": False}
 
 
-def download_window(data_dict):
+def drs_download_window(data_dict):
     package_id = data_dict.get("package_id")
     try:
         tk.check_access("package_show", {"id": package_id})
