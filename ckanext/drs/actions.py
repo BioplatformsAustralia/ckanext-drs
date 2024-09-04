@@ -208,9 +208,11 @@ def get_access_url(object_id, access_id):
 
 @tk.side_effect_free
 def drs_download_window(context, data_dict):
+    log.info("drs dw")
+    log.info(data_dict)
     access_id = data_dict.get("access_id", None)
-    if access_id is not "download_window":
-        raise tk.ValidationError({"access_id": "Unsupported access id"})
+    #if access_id is not "download_window":
+    #    raise tk.ValidationError({"access_id": "Unsupported access id"})
 
     res_data = tk.get_action("resource_show")(
             {"ignore_auth": True}, {"id": object_id}
@@ -221,6 +223,7 @@ def drs_download_window(context, data_dict):
 
     # Return S3 download link for a resource
     dw_data_dict = {"package_id": package_id, "resource_id": resource_id}
+    log.info(dw_data_dict)
     res_data = tk.get_action("download_window")(context, dw_data_dict)
     link = res_data.get("url")
 
