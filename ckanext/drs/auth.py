@@ -5,14 +5,14 @@ from ckan.plugins import toolkit as tk
 logger = logging.getLogger(__name__)
 
 
-def option_show():
+def option_show(context, data_dict):
     '''
     Return the DRS option for a resource
     '''
     return {"success": True}
 
 
-def service_info_show():
+def service_info_show(context, data_dict):
     '''
     Return the DRS service info for a resource
     '''
@@ -39,7 +39,7 @@ def get_object_info(context, data_dict):
             return {"success": False}
 
 
-def drs_download_window(data_dict):
+def drs_download_window(context, data_dict):
     package_id = data_dict.get("package_id")
     try:
         tk.check_access("package_show", {"id": package_id})
