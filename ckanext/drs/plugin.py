@@ -17,7 +17,8 @@ class DrsPlugin(plugins.SingletonPlugin):
     plugins.implements(plugins.IBlueprint, inherit=True)
     plugins.implements(plugins.IActions)
     plugins.implements(plugins.IAuthFunctions)
-    plugins.implements(plugins.IApiToken, inherit=True)
+    # Disabled whilst verifying broader impacts
+    # plugins.implements(plugins.IApiToken, inherit=True)
 
     # IConfigurer
 
