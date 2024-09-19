@@ -1,8 +1,13 @@
 import json
 import logging
+import six
 
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
+import ckan.lib.api_token as api_token
+from ckan import model
+from ckan.common import g, request
+
 from ckanext.drs import views
 from ckanext.drs import actions
 from ckanext.drs import auth
@@ -17,8 +22,7 @@ class DrsPlugin(plugins.SingletonPlugin):
     plugins.implements(plugins.IBlueprint, inherit=True)
     plugins.implements(plugins.IActions)
     plugins.implements(plugins.IAuthFunctions)
-    # Disabled whilst verifying broader impacts
-    # plugins.implements(plugins.IApiToken, inherit=True)
+    plugins.implements(plugins.IAuthenticator, inherit=True)
 
     # IConfigurer
 
@@ -60,8 +64,56 @@ class DrsPlugin(plugins.SingletonPlugin):
             "drs_download_window": auth.drs_download_window,
         }
 
-    # IApiToken
-    def decode_api_token(self, token, **kwargs):
-        # Remove bearer token prefix
-        token = token.split(' ')[-1]
-        return token
+    # IAuthenticator
+    def identify(self):
+        def set_user_for_current_request(user):
+            from flask import current_app
+
+            current_app.login_manager._update_request_context_with_user(user)
+
+        authorization = None
+        if not authorization:
+            authorization = request.environ.get("HTTP_AUTHORIZATION", None)
+        if not authorization:
+            authorization = request.environ.get("Authorization", None)
+        if not authorization:
+            # no header
+            return
+
+        # Need to look for Bearer header
+        if not authorization.startswith("Bearer "):
+            # not a bearer token
+            return
+
+        # Split and see if token
+        bearer_token = authorization.split(" ", 1)[-1]
+        bearer_token = six.ensure_text(bearer_token, errors="ignore")
+        log.debug(f"Received Bearer Token: {bearer_token[:10]}[...]")
+
+        if not bearer_token:
+            return
+
+        user = None
+        # if 2.9 or earlier, API key
+        if not toolkit.check_ckan_version(min_version="2.10"):
+            query = model.Session.query(model.User)
+            user = query.filter_by(apikey=bearer_token).first()
+
+        if not user:
+            user = api_token.get_user_from_token(bearer_token)
+
+        if not user:
+            return
+
+        g.user = user.name
+        g.userobj = user
+
+        # IAuthenticator interface is presently broken in CKAN 2.10
+        #
+        # It is discussed in ckan/ckan#7581
+        # Adopting interim fix described in ckan/ckan#7591
+        #
+        if toolkit.check_ckan_version(min_version="2.10"):
+            set_user_for_current_request(user)
+
+        return

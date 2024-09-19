@@ -208,9 +208,6 @@ def get_access_url(object_id, access_id):
 
 @tk.side_effect_free
 def drs_download_window(context, data_dict):
-    log.info("drs dw")
-    log.info(context)
-    log.info(data_dict)
     object_id = data_dict.get("object_id", None)
     access_id = data_dict.get("access_id", None)
     if access_id != "download_window":
@@ -225,7 +222,6 @@ def drs_download_window(context, data_dict):
 
     # Return S3 download link for a resource
     dw_data_dict = {"package_id": package_id, "resource_id": resource_id}
-    log.info(dw_data_dict)
     res_data = tk.get_action("download_window")(context, dw_data_dict)
     link = res_data.get("url")
 
