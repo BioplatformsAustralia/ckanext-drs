@@ -23,9 +23,9 @@ class DrsPlugin(plugins.SingletonPlugin):
     # IConfigurer
 
     def update_config(self, config_):
-        toolkit.add_template_directory(config_, 'templates')
-        toolkit.add_public_directory(config_, 'public')
-        toolkit.add_resource('assets', 'drs')
+        toolkit.add_template_directory(config_, "templates")
+        toolkit.add_public_directory(config_, "public")
+        toolkit.add_resource("assets", "drs")
 
     # ITemplateHelpers
     def get_helpers(self):
@@ -45,19 +45,19 @@ class DrsPlugin(plugins.SingletonPlugin):
     # IActions
     def get_actions(self):
         return {
-            'drs_option_show': actions.option_show,
-            'drs_get_object_info': actions.get_object_info,
-            'drs_service_info_show': actions.service_info_show,
-            'drs_get_access_url': actions.get_access_url,
-            'drs_download_window': actions.drs_download_window
+            "drs_option_show": actions.option_show,
+            "drs_get_object_info": actions.get_object_info,
+            "drs_service_info_show": actions.service_info_show,
+            "drs_get_access_url": actions.get_access_url,
+            "drs_download_window": actions.drs_download_window,
         }
 
     # IAuthFunctions
     def get_auth_functions(self):
         return {
-            'drs_option_show': auth.option_show,
-            'drs_get_object_info': auth.get_object_info,
-            'drs_download_window': auth.drs_download_window,
+            "drs_option_show": auth.option_show,
+            "drs_get_object_info": auth.get_object_info,
+            "drs_download_window": auth.drs_download_window,
         }
 
     # IApiToken
