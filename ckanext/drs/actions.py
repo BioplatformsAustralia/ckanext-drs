@@ -1,7 +1,9 @@
 # endcoding: utf-8
 
 import logging
+import functools
 from datetime import datetime
+from urllib.parse import urlparse
 
 from ckan.plugins import toolkit as tk
 
@@ -91,12 +93,20 @@ def service_info_show(context, data_dict):
     return response
 
 
+def _extract_drs_contents_object(resource, drs_host=None):
+    drs_uri = f'drs://{drs_host}/{resource.get("id")}'
+    contents_object = {
+        "name": resource.get("name"),
+        "id": resource.get("id"),
+        "drs_uri": [drs_uri],
+    }
+
+    return contents_object
+
+
 def _extract_drs_object(data_dict, is_resource=True):
-    drs_uri = (
-        f'drs://{data_dict.get("url").split("/")[2]}/{data_dict.get("id")}'
-        if is_resource
-        else None
-    )
+    drs_host = urlparse(tk.config.get("ckan.site_url")).hostname
+    drs_uri = f'drs://{drs_host}/{data_dict.get("id")}' if is_resource else None
     drs_object = {
         "id": data_dict.get("id"),
         "name": (data_dict.get("filename") if is_resource else data_dict.get("name"))
@@ -157,31 +167,19 @@ def _extract_drs_object(data_dict, is_resource=True):
             }
         )
     else:
+        # Return a bundle of ContentsObjects
+        contents = list(
+            map(
+                functools.partial(_extract_drs_contents_object, drs_host=drs_host),
+                data_dict.get("resources"),
+            )
+        )
         drs_object.update(
             {
                 "mime_type": None,
                 "checksums": [{"checksum": None, "type": None}],
-                "access_methods": [
-                    {
-                        "access_id": "download_window",
-                        "type": "https",
-                        "access_url": get_access_url(
-                            data_dict.get("id"), "download_window"
-                        ),
-                        "authorizations": {
-                            "drs_object_id": "string",
-                            "supported_types": "None",
-                        },
-                    }
-                ],
                 "aliases": [data_dict.get("name")],
-                "contents": [
-                    {
-                        "name": data_dict.get("name"),
-                        "drs_uri": [drs_uri],
-                        "id": data_dict.get("id"),
-                    }
-                ],
+                "contents": contents,
                 "checksum": None,
                 "size": 0,
                 "version": 1,
