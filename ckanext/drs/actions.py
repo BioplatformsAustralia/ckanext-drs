@@ -144,13 +144,6 @@ def _extract_drs_object(data_dict, is_resource=True):
                     {
                         "access_id": "download_window",
                         "type": "https",
-                        "access_url": get_access_url(
-                            data_dict.get("id"), "download_window"
-                        ),
-                        "authorizations": {
-                            "drs_object_id": "string",
-                            "supported_types": "None",
-                        },
                     }
                 ],
                 "aliases": [data_dict.get("name")],
@@ -187,22 +180,6 @@ def _extract_drs_object(data_dict, is_resource=True):
     return drs_object
 
 
-def get_access_url(object_id, access_id):
-    log.info("***************** ACCESS URL: " + object_id + "/ " + access_id)
-    # Return the DRS access url for a resource
-    if not object_id:
-        raise tk.ValidationError({"object_id": "Missing object id"})
-    if not access_id:
-        raise tk.ValidationError({"access_id": "Missing access id"})
-    if access_id == "download_window":
-        res_data = tk.get_action("resource_show")(
-            {"ignore_auth": True}, {"id": object_id}
-        )
-        package_id = res_data.get("package_id")
-        url = f"download_window?package_id={package_id}&resource_id={object_id}"
-        return url
-
-
 @tk.side_effect_free
 def drs_download_window(context, data_dict):
     object_id = data_dict.get("object_id", None)
@@ -222,5 +199,6 @@ def drs_download_window(context, data_dict):
     res_data = tk.get_action("download_window")(context, dw_data_dict)
     link = res_data.get("url")
 
+    # Return AccessURL object
     response = {"url": link.split("?")[0], "header": "Authorization: "}
     return response
