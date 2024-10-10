@@ -200,5 +200,5 @@ def drs_get_access_url(context, data_dict):
     link = res_data.get("url")
 
     # Return AccessURL object
-    response = {"url": link}
+    response = {"headers": ["Authorization:"], "url": link}
     return response
