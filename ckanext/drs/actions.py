@@ -181,7 +181,7 @@ def _extract_drs_object(data_dict, is_resource=True):
 
 
 @tk.side_effect_free
-def drs_download_window(context, data_dict):
+def drs_get_access_url(context, data_dict):
     object_id = data_dict.get("object_id", None)
     access_id = data_dict.get("access_id", None)
     if access_id != "download_window":

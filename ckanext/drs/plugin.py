@@ -52,8 +52,7 @@ class DrsPlugin(plugins.SingletonPlugin):
             "drs_option_show": actions.option_show,
             "drs_get_object_info": actions.get_object_info,
             "drs_service_info_show": actions.service_info_show,
-            "drs_get_access_url": actions.get_access_url,
-            "drs_download_window": actions.drs_download_window,
+            "drs_get_access_url": actions.drs_get_access_url,
         }
 
     # IAuthFunctions
@@ -61,7 +60,7 @@ class DrsPlugin(plugins.SingletonPlugin):
         return {
             "drs_option_show": auth.option_show,
             "drs_get_object_info": auth.get_object_info,
-            "drs_download_window": auth.drs_download_window,
+            "drs_get_access_url": auth.drs_get_access_url,
         }
 
     # IAuthenticator
