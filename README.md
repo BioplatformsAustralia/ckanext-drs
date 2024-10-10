@@ -5,6 +5,11 @@
 This CKAN extension implements the Data Repository Service (DRS) API - https://ga4gh.github.io/data-repository-service-schemas/ - to
 enable programmatic access to CKAN dataset resources.
 
+## API Support Level
+
+The ckanext-drs extension supports the GA4GH Data Respository Service API version 1.5.0
+
+https://ga4gh.github.io/data-repository-service-schemas/preview/release/drs-1.5.0/docs/
 
 ## Requirements
 
