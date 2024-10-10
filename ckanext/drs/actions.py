@@ -139,7 +139,7 @@ def _extract_drs_object(data_dict, is_resource=True):
         drs_object.update(
             {
                 "mime_type": data_dict.get("mimetype"),
-                "checksums": [{"checksum": data_dict.get("hash"), "type": "md5"}],
+                "checksums": [{"checksum": data_dict.get("md5"), "type": "md5"}],
                 "access_methods": [
                     {
                         "access_id": "download_window",
@@ -161,7 +161,6 @@ def _extract_drs_object(data_dict, is_resource=True):
                         "id": data_dict.get("id"),
                     }
                 ],
-                "checksum": data_dict.get("hash"),
                 "size": data_dict.get("size"),
                 "version": data_dict.get("version") if data_dict.get("version") else 1,
             }
