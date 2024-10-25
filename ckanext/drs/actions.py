@@ -109,8 +109,7 @@ def _extract_drs_object(data_dict, is_resource=True):
     drs_uri = f'drs://{drs_host}/{data_dict.get("id")}' if is_resource else None
     drs_object = {
         "id": data_dict.get("id"),
-        "name": (data_dict.get("filename") if is_resource else data_dict.get("name"))
-        or "",
+        "name": data_dict.get("name") or "",
         "description": data_dict.get("description") or "",
         "created_time": (
             data_dict.get("created")
