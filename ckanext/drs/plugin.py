@@ -36,7 +36,12 @@ class DrsPlugin(plugins.SingletonPlugin):
         return {}
 
     # IResourceController
+    # CKAN < 2.10
     def before_show(self, resource_dict):
+        return self.before_resource_show(resource_dict)
+
+    # CKAN >= 2.10
+    def before_resource_show(self, resource_dict):
         # check for drs resource
         # drs_res = utils.get_drs_resource(resource_dict)
         pass
