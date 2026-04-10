@@ -58,13 +58,9 @@ def get_object_info(context, data_dict):
     is_resource = False
     if obj_id.startswith("~"):
         obj_id = obj_id[1:]
-        result_dict = tk.get_action("package_show")(
-            {"ignore_auth": True}, {"id": obj_id}
-        )
+        result_dict = tk.get_action("package_show")(context, {"id": obj_id})
     else:
-        result_dict = tk.get_action("resource_show")(
-            {"ignore_auth": True}, {"id": obj_id}
-        )
+        result_dict = tk.get_action("resource_show")(context, {"id": obj_id})
         is_resource = True
 
     result = _extract_drs_object(result_dict, is_resource=is_resource)

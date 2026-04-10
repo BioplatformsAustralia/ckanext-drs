@@ -13,36 +13,38 @@ drs_blueprint = Blueprint("drs", __name__, url_prefix="/ga4gh/drs/v1")
 
 
 def _drs_error(status_code, msg):
-    body = json.dumps({"status_code": status_code, "msg": msg})
+    body = json.dumps({"status_code": status_code, "msg": msg}) + "\n"
     return make_response(body, status_code, {"Content-Type": "application/json"})
 
 
 def drs_option(object_id):
-    # Return the DRS option for a resource
     log.info("***************** OBJECT ID" + object_id)
-
-    response = tk.get_action("drs_option_show")({}, {"object_id": object_id})
-
-    return response
+    try:
+        return tk.get_action("drs_option_show")({}, {"object_id": object_id})
+    except tk.ObjectNotFound:
+        return _drs_error(404, f"Not Found: object '{object_id}' does not exist")
+    except tk.NotAuthorized:
+        return _drs_error(403, f"Forbidden: you do not have permission to access object '{object_id}'")
 
 
 def drs_get_object_info(object_id):
-    # Return the DRS object info for a resource
-    response = tk.get_action("drs_get_object_info")({}, {"object_id": object_id})
-
-    return response
-    # return make_response(str(response), 200, {'Content-Type': 'application/json'})
+    try:
+        context = {"user": tk.g.user, "auth_user_obj": tk.g.userobj}
+        return tk.get_action("drs_get_object_info")(context, {"object_id": object_id})
+    except tk.ObjectNotFound:
+        return _drs_error(404, f"Not Found: object '{object_id}' does not exist")
+    except tk.NotAuthorized:
+        return _drs_error(403, f"Forbidden: you do not have permission to access object '{object_id}'")
 
 
 def drs_get_access_url(object_id, access_id):
-    # Return the DRS access url for a resource
     try:
         context = {"user": tk.g.user, "auth_user_obj": tk.g.userobj}
         response = tk.get_action("drs_get_access_url")(
             context, {"access_id": access_id, "object_id": object_id}
         )
         # CKAN may return a redirect Response object (instead of raising) when
-        # auth fails in a web-request context — convert that to a proper 401.
+        # auth fails in a web-request context — convert that to a proper 403.
         if isinstance(response, Response) and response.status_code in (301, 302, 303, 307, 308):
             return _drs_error(403, f"Forbidden: you do not have permission to access object '{object_id}'")
         return response
