@@ -1,4 +1,5 @@
-from flask import Blueprint
+from flask import Blueprint, make_response
+import json
 
 from ckan.plugins import toolkit as tk
 
@@ -9,6 +10,11 @@ import logging
 log = logging.getLogger(__name__)
 
 drs_blueprint = Blueprint("drs", __name__, url_prefix="/ga4gh/drs/v1")
+
+
+def _drs_error(status_code, msg):
+    body = json.dumps({"status_code": status_code, "msg": msg})
+    return make_response(body, status_code, {"Content-Type": "application/json"})
 
 
 def drs_option(object_id):
@@ -30,10 +36,21 @@ def drs_get_object_info(object_id):
 
 def drs_get_access_url(object_id, access_id):
     # Return the DRS access url for a resource
-    response = tk.get_action("drs_get_access_url")(
-        None, {"access_id": access_id, "object_id": object_id}
-    )
-    return response
+    try:
+        context = {"user": tk.g.user, "auth_user_obj": tk.g.userobj}
+        response = tk.get_action("drs_get_access_url")(
+            context, {"access_id": access_id, "object_id": object_id}
+        )
+        return response
+    except tk.NotAuthorized:
+        return _drs_error(401, "Unauthorized")
+    except tk.ObjectNotFound:
+        return _drs_error(404, "Not Found")
+    except tk.ValidationError as e:
+        msg = next(iter(e.error_dict.values()), "Bad Request") if e.error_dict else "Bad Request"
+        if isinstance(msg, list):
+            msg = msg[0]
+        return _drs_error(400, str(msg))
 
 
 def service_info():
