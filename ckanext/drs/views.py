@@ -1,4 +1,4 @@
-from flask import Blueprint, make_response
+from flask import Blueprint, Response, make_response
 import json
 
 from ckan.plugins import toolkit as tk
@@ -41,9 +41,13 @@ def drs_get_access_url(object_id, access_id):
         response = tk.get_action("drs_get_access_url")(
             context, {"access_id": access_id, "object_id": object_id}
         )
+        # CKAN may return a redirect Response object (instead of raising) when
+        # auth fails in a web-request context — convert that to a proper 401.
+        if isinstance(response, Response) and response.status_code in (301, 302, 303, 307, 308):
+            return _drs_error(403, f"Forbidden: you do not have permission to access object '{object_id}'")
         return response
     except tk.NotAuthorized:
-        return _drs_error(401, f"Unauthorized: you do not have permission to access object '{object_id}'")
+        return _drs_error(403, f"Forbidden: you do not have permission to access object '{object_id}'")
     except tk.ObjectNotFound:
         return _drs_error(404, f"Not Found: object '{object_id}' does not exist")
     except tk.ValidationError as e:

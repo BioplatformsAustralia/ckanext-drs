@@ -193,13 +193,16 @@ def drs_get_access_url(context, data_dict):
     package_id = res_data.get("package_id")
     resource_id = data_dict.get("object_id", None)
 
-    # Check that the caller is allowed to access this package before
-    # handing off to download_window (raises NotAuthorized if not).
+    # Check the caller is permitted to access this package. Raises NotAuthorized
+    # (a Python exception, not an HTTP response) if the user lacks permission.
     tk.check_access("package_show", context, {"id": package_id})
 
-    # Return S3 download link for a resource
+    # Call download_window with ignore_auth=True: download_window has no
+    # registered CKAN auth function, so without this CKAN's default denies
+    # all callers. Auth was already verified above.
+    dw_context = dict(context or {}, ignore_auth=True)
     dw_data_dict = {"package_id": package_id, "resource_id": resource_id}
-    res_data = tk.get_action("download_window")(context, dw_data_dict)
+    res_data = tk.get_action("download_window")(dw_context, dw_data_dict)
     link = res_data.get("url")
 
     # Return AccessURL object
