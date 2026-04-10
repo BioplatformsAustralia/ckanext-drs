@@ -43,9 +43,9 @@ def drs_get_access_url(object_id, access_id):
         )
         return response
     except tk.NotAuthorized:
-        return _drs_error(401, "Unauthorized")
+        return _drs_error(401, f"Unauthorized: you do not have permission to access object '{object_id}'")
     except tk.ObjectNotFound:
-        return _drs_error(404, "Not Found")
+        return _drs_error(404, f"Not Found: object '{object_id}' does not exist")
     except tk.ValidationError as e:
         msg = next(iter(e.error_dict.values()), "Bad Request") if e.error_dict else "Bad Request"
         if isinstance(msg, list):
