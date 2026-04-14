@@ -58,13 +58,9 @@ def get_object_info(context, data_dict):
     is_resource = False
     if obj_id.startswith("~"):
         obj_id = obj_id[1:]
-        result_dict = tk.get_action("package_show")(
-            {"ignore_auth": True}, {"id": obj_id}
-        )
+        result_dict = tk.get_action("package_show")(context, {"id": obj_id})
     else:
-        result_dict = tk.get_action("resource_show")(
-            {"ignore_auth": True}, {"id": obj_id}
-        )
+        result_dict = tk.get_action("resource_show")(context, {"id": obj_id})
         is_resource = True
 
     result = _extract_drs_object(result_dict, is_resource=is_resource)
@@ -193,9 +189,16 @@ def drs_get_access_url(context, data_dict):
     package_id = res_data.get("package_id")
     resource_id = data_dict.get("object_id", None)
 
-    # Return S3 download link for a resource
+    # Check the caller is permitted to access this package. Raises NotAuthorized
+    # (a Python exception, not an HTTP response) if the user lacks permission.
+    tk.check_access("package_show", context, {"id": package_id})
+
+    # Call download_window with ignore_auth=True: download_window has no
+    # registered CKAN auth function, so without this CKAN's default denies
+    # all callers. Auth was already verified above.
+    dw_context = dict(context or {}, ignore_auth=True)
     dw_data_dict = {"package_id": package_id, "resource_id": resource_id}
-    res_data = tk.get_action("download_window")(context, dw_data_dict)
+    res_data = tk.get_action("download_window")(dw_context, dw_data_dict)
     link = res_data.get("url")
 
     # Return AccessURL object

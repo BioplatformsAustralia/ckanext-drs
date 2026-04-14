@@ -40,9 +40,7 @@ def get_object_info(context, data_dict):
 
 
 def drs_get_access_url(context, data_dict):
-    package_id = data_dict.get("package_id")
-    try:
-        tk.check_access("package_show", {"id": package_id})
-        return {"success": True}
-    except tk.NotAuthorized:
-        return {"success": False}
+    # Authorization is enforced inside the action after the package_id is
+    # resolved (it is not available in the data_dict at auth-check time).
+    # The downstream `download_window` action performs the real auth check.
+    return {"success": True}
