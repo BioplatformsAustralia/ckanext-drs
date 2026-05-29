@@ -1,13 +1,42 @@
-from flask import Blueprint, Response, make_response
+from flask import Blueprint, Response, make_response, request as flask_request
 import json
 
 from ckan.plugins import toolkit as tk
+from ckan.common import config
 
 import ckan.views.api as api
 import logging
 
 
 log = logging.getLogger(__name__)
+
+
+def _oidc_context():
+    """Return an ignore_auth context if the request carries a valid OIDC Bearer token.
+
+    Galaxy calls CKAN's DRS endpoints with the user's Auth0 Bearer token
+    (via the BPA DRS file source configured with oidc_auth_provider: auth0).
+    We verify the JWT signature against the OIDC provider's JWKS and, if valid,
+    trust the authentication — the user proved their identity via Auth0.
+    """
+    auth = flask_request.headers.get("Authorization", "")
+    if not auth.startswith("Bearer "):
+        return None
+    token = auth[7:]
+    try:
+        import jwt
+        from jwt import PyJWKClient
+        base_url = config.get("ckanext.oidc_pkce.base_url", "").rstrip("/")
+        if not base_url:
+            return None
+        client = PyJWKClient(f"{base_url}/.well-known/jwks.json")
+        key = client.get_signing_key_from_jwt(token)
+        jwt.decode(token, key.key, algorithms=["RS256"])
+        log.info("drs: valid OIDC Bearer token — using ignore_auth context")
+        return {"ignore_auth": True}
+    except Exception as e:
+        log.debug("drs: OIDC Bearer validation failed: %s", e)
+        return None
 
 drs_blueprint = Blueprint("drs", __name__, url_prefix="/ga4gh/drs/v1")
 
@@ -29,7 +58,7 @@ def drs_option(object_id):
 
 def drs_get_object_info(object_id):
     try:
-        context = {"user": tk.g.user, "auth_user_obj": tk.g.userobj}
+        context = _oidc_context() or {"user": tk.g.user, "auth_user_obj": tk.g.userobj}
         return tk.get_action("drs_get_object_info")(context, {"object_id": object_id})
     except tk.ObjectNotFound:
         return _drs_error(404, f"Not Found: object '{object_id}' does not exist")
@@ -39,7 +68,7 @@ def drs_get_object_info(object_id):
 
 def drs_get_access_url(object_id, access_id):
     try:
-        context = {"user": tk.g.user, "auth_user_obj": tk.g.userobj}
+        context = _oidc_context() or {"user": tk.g.user, "auth_user_obj": tk.g.userobj}
         response = tk.get_action("drs_get_access_url")(
             context, {"access_id": access_id, "object_id": object_id}
         )
