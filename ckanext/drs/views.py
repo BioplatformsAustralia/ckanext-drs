@@ -2,25 +2,11 @@ from flask import Blueprint, Response, make_response
 import json
 
 from ckan.plugins import toolkit as tk
-from ckan.common import request
 
 import ckan.views.api as api
 import logging
 
 log = logging.getLogger(__name__)
-
-
-def _context_from_bearer_token():
-    """Return a CKAN user context from an Auth0 Bearer token, or None.
-
-    Delegates to ckanext-oidc-pkce-bpa which owns Auth0 token validation.
-    CKAN's normal per-resource permission checks still apply.
-    """
-    try:
-        from ckanext.oidc_pkce_bpa.utils import ckan_context_from_bearer_token
-        return ckan_context_from_bearer_token(request.headers.get("Authorization", ""))
-    except ImportError:
-        return None
 
 
 drs_blueprint = Blueprint("drs", __name__, url_prefix="/ga4gh/drs/v1")
@@ -43,11 +29,7 @@ def drs_option(object_id):
 
 def drs_get_object_info(object_id):
     try:
-        # Session auth takes precedence; Bearer token is only for server-to-server
-        # callers (e.g. Galaxy) that have no CKAN session.
         context = {"user": tk.g.user, "auth_user_obj": tk.g.userobj}
-        if not tk.g.user:
-            context = _context_from_bearer_token() or context
         return tk.get_action("drs_get_object_info")(context, {"object_id": object_id})
     except tk.ObjectNotFound:
         return _drs_error(404, f"Not Found: object '{object_id}' does not exist")
@@ -57,11 +39,7 @@ def drs_get_object_info(object_id):
 
 def drs_get_access_url(object_id, access_id):
     try:
-        # Session auth takes precedence; Bearer token is only for server-to-server
-        # callers (e.g. Galaxy) that have no CKAN session.
         context = {"user": tk.g.user, "auth_user_obj": tk.g.userobj}
-        if not tk.g.user:
-            context = _context_from_bearer_token() or context
         response = tk.get_action("drs_get_access_url")(
             context, {"access_id": access_id, "object_id": object_id}
         )
