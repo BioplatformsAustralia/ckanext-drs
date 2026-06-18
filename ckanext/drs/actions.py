@@ -122,13 +122,6 @@ def _extract_drs_object(data_dict, is_resource=True):
             data_dict.get("version") if is_resource and data_dict.get("version") else 1
         ),
         "self_uri": drs_uri,
-        "contents": [
-            {
-                "name": data_dict.get("name"),
-                "drs_uri": [drs_uri],
-                "id": data_dict.get("id"),
-            }
-        ],
     }
     if is_resource:
         drs_object.update(
@@ -142,13 +135,6 @@ def _extract_drs_object(data_dict, is_resource=True):
                     }
                 ],
                 "aliases": [data_dict.get("name")],
-                "contents": [
-                    {
-                        "name": data_dict.get("name"),
-                        "drs_uri": [drs_uri],
-                        "id": data_dict.get("id"),
-                    }
-                ],
                 "size": data_dict.get("size"),
                 "version": data_dict.get("version") if data_dict.get("version") else 1,
             }
